@@ -15,20 +15,22 @@ exports.handleRequest = function (req, res) {
       var slicedChunk = chunk.slice(4).toString();
       fs.open(archive.paths.archivedSites + '/' + slicedChunk, 'r', function(err, fd){
         if(err){//doesn't exist
-
           if (false) {
             //if it exists in archive.paths.list
               //serve up loading
           } else {
             //write file to archive.paths.list
-            console.log('look ma, we made it!');
+            //add \n so that each url is placed on a new line
+            slicedChunk = slicedChunk + "\n";
             fs.writeFile(archive.paths.list, slicedChunk, function(err){
               if (err){
               httpHelpers.serveAssets(res,null,404);
               } else {
+                //make it serve up the freshly archived site to replace
+                //the loading site once the site has been archived by chron
                 var loadingPage = 'loading.html';
                 var loadingScript = '<script>window.location.href = "http://127.0.0.1:8080/' + loadingPage +'"</script>';
-                httpHelpers.serveAssets(res, loadingScript, 200);
+                httpHelpers.serveAssets(res, loadingScript, 302);
               }
 
             });
@@ -55,7 +57,6 @@ exports.handleRequest = function (req, res) {
         httpHelpers.serveAssets(res, data, 200);
       });
     } else if(req.url === '/styles.css'){
-        console.log('css loaded');
       fs.readFile(archive.paths.siteAssets + '/styles.css', function(err, data){
         if (err) {
           console.log(err);
