@@ -10,14 +10,22 @@ exports.handleRequest = function (req, res) {
 
   //serve index.html
   if (req.method === 'POST'){
-    //var html =  fs.readFileSync(archive.paths.archivedSites + req.url);
-    if (true){
-      req.on('data', function(chunk){
-        var chunk = chunk.slice(4).toString();
-        var javastuff = '<script>window.location.href = "http://127.0.0.1:8080/' + chunk +'"</script>';
-        httpHelpers.serveAssets(res, javastuff, 200);
-      })
-    }
+    //var html =  fs.readFileSync(archive.paths.archivedSites + req.url, function(err, data) {if (err)});
+    req.on('data', function(chunk){
+      var slicedChunk = chunk.slice(4).toString();
+      fs.open(archive.paths.archivedSites + '/' + slicedChunk, 'r', function(err, fd){
+        console.log(archive.paths.archivedSites + slicedChunk);
+        if(err){//doesn't exist
+          console.log(slicedChunk + " doesn't exist");
+          httpHelpers.serveAssets(res,chunk,400);
+        } else {
+          var javastuff = '<script>window.location.href = "http://127.0.0.1:8080/' + slicedChunk +'"</script>';
+          httpHelpers.serveAssets(res, javastuff, 200);
+        }
+      });
+
+
+    });
     //get the data
     //if the data is in sites
     //  serve file
