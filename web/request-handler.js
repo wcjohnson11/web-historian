@@ -14,10 +14,25 @@ exports.handleRequest = function (req, res) {
     req.on('data', function(chunk){
       var slicedChunk = chunk.slice(4).toString();
       fs.open(archive.paths.archivedSites + '/' + slicedChunk, 'r', function(err, fd){
-        console.log(archive.paths.archivedSites + slicedChunk);
         if(err){//doesn't exist
-          console.log(slicedChunk + " doesn't exist");
-          httpHelpers.serveAssets(res,chunk,400);
+
+          if (false) {
+            //if it exists in archive.paths.list
+              //serve up loading
+          } else {
+            //write file to archive.paths.list
+            console.log('look ma, we made it!');
+            fs.writeFile(archive.paths.list, slicedChunk, function(err){
+              if (err){
+              httpHelpers.serveAssets(res,null,404);
+              } else {
+                var loadingPage = 'loading.html';
+                var loadingScript = '<script>window.location.href = "http://127.0.0.1:8080/' + loadingPage +'"</script>';
+                httpHelpers.serveAssets(res, loadingScript, 200);
+              }
+
+            });
+          }
         } else {
           var javastuff = '<script>window.location.href = "http://127.0.0.1:8080/' + slicedChunk +'"</script>';
           httpHelpers.serveAssets(res, javastuff, 200);
@@ -26,16 +41,28 @@ exports.handleRequest = function (req, res) {
 
 
     });
-    //get the data
-    //if the data is in sites
-    //  serve file
-    // call get
+
     //if the data is not in sites.txt
     //  write to sites.txt
     //
     //
   } else if (req.method === 'GET'){
-    if (req.url[1] !== undefined){
+    if (req.url === '/loading.html') {
+      fs.readFile(archive.paths.siteAssets + '/loading.html', function(err, data){
+        if (err) {
+          console.log(err);
+        }
+        httpHelpers.serveAssets(res, data, 200);
+      });
+    } else if(req.url === '/styles.css'){
+        console.log('css loaded');
+      fs.readFile(archive.paths.siteAssets + '/styles.css', function(err, data){
+        if (err) {
+          console.log(err);
+        }
+        httpHelpers.serveAssets(res, data, 200);
+       });
+    } else if (req.url[1] !== undefined){
       fs.readFile(archive.paths.archivedSites + req.url, function(err,data) {
         if (err){
           console.log("Yarrrrrg, here there be errorrs");
@@ -45,14 +72,16 @@ exports.handleRequest = function (req, res) {
         }
       });
     }
+
     if (req.url === '/') {
-      var html =  fs.readFileSync(archive.paths.siteAssets + '/index.html');
-      httpHelpers.serveAssets(res, html, 200);
-    } else if(req.url === '/styles.css'){
-       var css = fs.readFileSync(archive.paths.siteAssets + '/styles.css');
-       httpHelpers.serveAssets(res, css, 200);
-    }
+      fs.readFile(archive.paths.siteAssets + '/index.html', function(err, data){
+        if (err) {
+          console.log(err);
+        }
+        httpHelpers.serveAssets(res, data, 200);
+      });
   //serving the file
+    }
   }
 
     //loop through sites file to srch for requested site
@@ -66,7 +95,7 @@ exports.handleRequest = function (req, res) {
 };
 //fs.existSync(filepath)
 
-//blah = fs.createReadStream(filename)
-//blah.on ('open')
-//blah.pipe(res)
 
+        //blah = fs.createReadStream(filename)
+        //blah.on ('open')
+        //blah.pipe(res)

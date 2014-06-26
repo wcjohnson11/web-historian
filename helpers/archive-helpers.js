@@ -30,12 +30,18 @@ exports.readListOfUrls = function(){
 };
 
 exports.isUrlInList = function(){
+  // var found = false;
+  // jsafsdf(){found = true}
+  // return found
 };
 
 exports.addUrlToList = function(){
 };
 
 exports.isURLArchived = function(){
+  // var found = false;
+  // jsafsdf(){found = true}
+  // return found
 };
 
 exports.downloadUrls = function(){
