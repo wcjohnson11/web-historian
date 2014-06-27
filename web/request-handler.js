@@ -15,9 +15,11 @@ exports.handleRequest = function (req, res) {
       var slicedChunk = chunk.slice(4).toString();
       fs.open(archive.paths.archivedSites + '/' + slicedChunk, 'r', function(err, fd){
         if(err){//doesn't exist
-          if (false) {
-            //if it exists in archive.paths.list
-              //serve up loading
+          if (archive.isUrlInList(slicedChunk)) {//if exists in sites.txt
+            console.log('hey');
+            var loadingPage = 'loading.html';
+            var loadingScript = '<script>window.location.href = "http://127.0.0.1:8080/' + loadingPage +'"</script>';
+            httpHelpers.serveAssets(res, loadingScript, 302);
           } else {
             //write file to archive.paths.list
             //add \n so that each url is placed on a new line

@@ -24,13 +24,33 @@ exports.initialize = function(pathsObj){
 
 // The following function names are provided to you to suggest how you might
 // modularize your code. Keep it clean!
-
-exports.readListOfUrls = function(){
-  //
+exports.sendRedirect = function(res, loc, status){
+  status = status || 302;
+  res.writeHead(status, {Location: loc});
+  res.end();
 };
 
-exports.isUrlInList = function(){
-  // var found = false;
+exports.readListOfUrls = function(list, theURL){
+  list = list.split('\n');
+  for (var i = 0; i < list.length; i++) {
+    if (theURL === list[i]) {
+      return true;
+    }
+  }
+  return false;
+};
+
+exports.isUrlInList = function(theURL){
+  var found = false;
+  //putting in the encoding to force data into a string
+  fs.readFile(exports.paths.list, {encoding: "utf8"}, function(err, data) {
+    if (err) {
+      console.log(err);
+    } else {
+      found = exports.readListOfUrls(data, theURL);
+    }
+    return found;
+  });
   // jsafsdf(){found = true}
   // return found
 };
